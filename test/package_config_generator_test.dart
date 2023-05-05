@@ -98,7 +98,9 @@ void main() {
   "generatorVersion": "3.1.0-56.0.dev"
 }''';
       final String packageConfigPath = fs.path.join(
-        '/path', 'to', 'package_config.json',
+        '/path',
+        'to',
+        'package_config.json',
       );
       fs.file(packageConfigPath)
         ..create(recursive: true)
@@ -121,7 +123,9 @@ void main() {
       );
     });
 
-    test('falls back on pub when an existing package config is missing something', () async {
+    test(
+        'falls back on pub when an existing package config is missing something',
+        () async {
       final String packageConfigContents = '''{
   "configVersion": 2,
   "packages": [
@@ -149,7 +153,9 @@ void main() {
   "generatorVersion": "3.1.0-56.0.dev"
 }''';
       final String packageConfigPath = fs.path.join(
-        '/path', 'to', 'package_config.json',
+        '/path',
+        'to',
+        'package_config.json',
       );
       final File packageConfigFile = fs.file(packageConfigPath)
         ..create(recursive: true)

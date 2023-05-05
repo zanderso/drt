@@ -36,7 +36,10 @@ Future<void> main() async {
   final File drtExe = binDirectory.childFile('drt.exe');
 
   final io.ProcessResult result = await pm.run(<String>[
-    dart, 'compile', 'exe', binDrt.path,
+    dart,
+    'compile',
+    'exe',
+    binDrt.path,
   ]);
   if (result.exitCode != 0) {
     print('Failed to compile to exe:\n${result.stdout}\n${result.stderr}');
@@ -60,7 +63,12 @@ Future<void> main() async {
       'echo_arguments.dart',
     );
     final io.ProcessResult echoResult = await pm.run(<String>[
-      drtExe.path, echoScriptFile.path, 'a', 'b', 'c', 'd',
+      drtExe.path,
+      echoScriptFile.path,
+      'a',
+      'b',
+      'c',
+      'd',
     ]);
 
     // The script emits the correct results.
@@ -73,9 +81,11 @@ Future<void> main() async {
       isTrue,
     );
     expect(
-      scriptsDirectory.childFile(
-        '.echo_arguments.package_config.json',
-      ).existsSync(),
+      scriptsDirectory
+          .childFile(
+            '.echo_arguments.package_config.json',
+          )
+          .existsSync(),
       isTrue,
     );
   });
@@ -85,7 +95,12 @@ Future<void> main() async {
       'echo_arguments.dart',
     );
     io.ProcessResult echoResult = await pm.run(<String>[
-      drtExe.path, echoScriptFile.path, 'a', 'b', 'c', 'd',
+      drtExe.path,
+      echoScriptFile.path,
+      'a',
+      'b',
+      'c',
+      'd',
     ]);
 
     expect(echoResult.exitCode, equals(0));
@@ -93,7 +108,12 @@ Future<void> main() async {
 
     // A second run produces the right results as well.
     echoResult = await pm.run(<String>[
-      drtExe.path, echoScriptFile.path, 'a', 'b', 'c', 'd',
+      drtExe.path,
+      echoScriptFile.path,
+      'a',
+      'b',
+      'c',
+      'd',
     ]);
 
     // The script emits the correct results.
@@ -103,7 +123,8 @@ Future<void> main() async {
   test('Stdin/out are plumbed correctly', () async {
     final File echoScriptFile = scriptsDirectory.childFile('echo_stdin.dart');
     io.Process process = await pm.start(<String>[
-      drtExe.path, echoScriptFile.path,
+      drtExe.path,
+      echoScriptFile.path,
     ]);
     process.stdin.writeln('hello');
     process.stdin.writeln('world');
@@ -113,8 +134,7 @@ Future<void> main() async {
     late List<String> stdoutLines;
     process.stdout.listen((List<int> data) {
       stdoutBuffer.write(utf8.decode(data));
-    },
-    onDone: () {
+    }, onDone: () {
       stdoutLines = LineSplitter().convert(stdoutBuffer.toString());
     });
 
@@ -122,8 +142,7 @@ Future<void> main() async {
     late String stderrString;
     process.stderr.listen((List<int> data) {
       stderrBuffer.write(utf8.decode(data));
-    },
-    onDone: () {
+    }, onDone: () {
       stderrString = stderrBuffer.toString();
     });
 
@@ -144,7 +163,9 @@ Future<void> main() async {
       drtExe.path,
       libScriptRunner.path,
       echoScriptFile.path,
-      'a', 'b', 'c',
+      'a',
+      'b',
+      'c',
     ]);
     cleanupDirectory(binDirectory);
     cleanupDirectory(libDirectory);

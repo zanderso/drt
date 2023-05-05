@@ -32,7 +32,7 @@ void main() {
 
     test('runs normally without snapshot or package config', () async {
       final String script = '/script.dart';
-      final String scriptContents ='''
+      final String scriptContents = '''
         import 'package:process/process.dart';
 
         void main() {}
