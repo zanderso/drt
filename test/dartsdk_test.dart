@@ -51,7 +51,9 @@ void main() {
       expect(dartSdk.dartExe, equals(dartPath));
     });
 
-    test('dartExe is non-null when it can be found from the platform with an extension', () {
+    test(
+        'dartExe is non-null when it can be found from the platform with an extension',
+        () {
       final String exePath = fs.path.join('path', 'to', 'dartaotruntime.exe');
       final String dartPath = fs.path.join('path', 'to', 'dart.exe');
       fs.file(exePath).createSync(recursive: true);
@@ -111,7 +113,8 @@ void main() {
         platform: FakePlatform(),
       );
       final int result = await dartSdk.runDart(<String>[
-        'run', 'some_script.dart',
+        'run',
+        'some_script.dart',
       ]);
       expect(result, equals(0));
     });

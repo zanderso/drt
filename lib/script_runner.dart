@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io'
-  show exitCode, Process, ProcessResult, ProcessStartMode;
+import 'dart:io' show exitCode, Process, ProcessResult, ProcessStartMode;
 
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/results.dart';
@@ -62,7 +61,7 @@ class DartSDK {
     return (true, null);
   }
 
-  late final String? dartExe = (){
+  late final String? dartExe = () {
     // First see if the processManager knows how to find 'dart'.
     if (processManager.canRun('dart')) {
       return 'dart';
@@ -385,12 +384,10 @@ class ScriptRunner {
       if (packageConfigFile.existsSync()) {
         packageConfigFile.deleteSync();
       }
-      final Set<String> packages = PackageImportExtractor(fs: fs)
-        .getPackages(script);
-      await PackageConfigGenerator(
-        fs: fs,
-        dartSdk: dartSdk
-      ).ensurePackageConfig(packages, packageConfigPath);
+      final Set<String> packages =
+          PackageImportExtractor(fs: fs).getPackages(script);
+      await PackageConfigGenerator(fs: fs, dartSdk: dartSdk)
+          .ensurePackageConfig(packages, packageConfigPath);
     }
 
     return packageConfigPath;

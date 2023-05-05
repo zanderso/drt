@@ -16,7 +16,7 @@ void main() {
     });
 
     test('Extracts package imports from a script', () {
-      final String scriptContents ='''
+      final String scriptContents = '''
         import 'dart:io'
           show exitCode, Process, ProcessResult, ProcessStartMode;
 
@@ -36,23 +36,26 @@ void main() {
         void main() {}
       ''';
       final String scriptPath = fs.path.join('path', 'to', 'script.dart');
-      fs.file(scriptPath)..createSync(recursive: true)
-                         ..writeAsStringSync(scriptContents);
+      fs.file(scriptPath)
+        ..createSync(recursive: true)
+        ..writeAsStringSync(scriptContents);
 
       final PackageImportExtractor extractor = PackageImportExtractor(
         fs: fs,
       );
       final Set<String> packages = extractor.getPackages(scriptPath);
       final List<String> sortedPackages = List.of(packages)..sort();
-      expect(sortedPackages, equals(<String>[
-        'analyzer',
-        'args',
-        'file',
-        'package_config',
-        'path',
-        'platform',
-        'process',
-      ]));
+      expect(
+          sortedPackages,
+          equals(<String>[
+            'analyzer',
+            'args',
+            'file',
+            'package_config',
+            'path',
+            'platform',
+            'process',
+          ]));
     });
   });
 }
