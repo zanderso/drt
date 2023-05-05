@@ -1,0 +1,25 @@
+# Copyright 2014 The Flutter Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: drt
+description: Runs Dart programs like CLI scripts.
+version: 1.0.0
+repository: https://github.com/zanderso/drt
+
+environment:
+  sdk: '>=3.0.0-0 <4.0.0'
+
+dependencies:
+  analyzer: 5.11.1
+  args: 2.4.0
+  file: 6.1.4
+  meta: 1.9.1
+  package_config: 2.1.0
+  path: 1.8.3
+  platform: 3.1.0
+  process: 4.2.4
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.21.0
