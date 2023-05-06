@@ -13,14 +13,6 @@ import 'package:process/process.dart';
 
 import 'src/test_wrapper.dart';
 
-void cleanupDirectory(Directory dir) {
-  for (final File f in dir.listSync().whereType<File>()) {
-    if (f.path.endsWith('.jit') || f.path.endsWith('.json')) {
-      f.deleteSync();
-    }
-  }
-}
-
 Future<void> main() async {
   final FileSystem fs = LocalFileSystem();
   final Platform platform = LocalPlatform();
@@ -33,12 +25,14 @@ Future<void> main() async {
 
   final File binDrt = binDirectory.childFile('drt.dart');
   final File libScriptRunner = libDirectory.childFile('script_runner.dart');
-  final File drtExe = binDirectory.childFile('drt.exe');
+  final File drtExe = binDirectory.childFile('drt');
 
   final io.ProcessResult result = await pm.run(<String>[
     dart,
     'compile',
     'exe',
+    '-o',
+    drtExe.path,
     binDrt.path,
   ]);
   if (result.exitCode != 0) {
@@ -56,6 +50,9 @@ Future<void> main() async {
   });
   tearDown(() {
     cleanupDirectory(scriptsDirectory);
+  });
+  tearDownAll(() {
+    tryDelete(drtExe);
   });
 
   test('Run a script', () async {
@@ -155,6 +152,30 @@ Future<void> main() async {
     expect(processResult, equals(0));
   });
 
+  test('File with a shebang can be run', () async {
+    final File shebangScriptFile = scriptsDirectory.childFile(
+      'shebang.dart',
+    );
+
+    final String? pathEnvVar = platform.environment['PATH'];
+    expect(pathEnvVar, isNotNull);
+
+    final String newPathEnvVar = '$pathEnvVar:${binDirectory.path}';
+
+    final io.ProcessResult result = await pm.run(
+      <String>[shebangScriptFile.path],
+      environment: <String, String>{'PATH': newPathEnvVar},
+    );
+
+    if (result.exitCode != 0) {
+      print(result.stderr);
+      print(result.stdout);
+    }
+
+    expect(result.exitCode, equals(0));
+    expect(result.stdout, equals('Hello, world!\n'));
+  });
+
   test('The script runner can run itself', () async {
     final File echoScriptFile = scriptsDirectory.childFile(
       'echo_arguments.dart',
@@ -178,4 +199,20 @@ Future<void> main() async {
     expect(result.exitCode, equals(0));
     expect(result.stdout, equals('arg/a\narg/b\narg/c\n'));
   });
+}
+
+void tryDelete(FileSystemEntity fse) {
+  try {
+    fse.deleteSync();
+  } catch (e) {
+    // Ignore.
+  }
+}
+
+void cleanupDirectory(Directory dir) {
+  for (final File f in dir.listSync().whereType<File>()) {
+    if (f.path.endsWith('.jit') || f.path.endsWith('.json')) {
+      tryDelete(f);
+    }
+  }
 }
