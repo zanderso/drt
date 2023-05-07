@@ -72,15 +72,20 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync(scriptContents);
 
+      final Platform platform = FakePlatform(
+        version: '3.1.0-56.0.dev',
+        environment: <String, String>{},
+      );
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(version: '3.1.0-56.0.dev'),
+        platform: platform,
       );
       final ScriptRunner scriptRunner = ScriptRunner(
         fs: fs,
         dartSdk: dartSdk,
         logger: BufferLogger(),
+        platform: platform,
       );
 
       await scriptRunner.run(<String>[script]);
@@ -104,15 +109,17 @@ void main() {
       fs.file(script).createSync(recursive: true);
       fs.file(appJitSnapshotPath).createSync(recursive: true);
 
+      final Platform platform = FakePlatform(version: '3.1.0-56.0.dev');
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(version: '3.1.0-56.0.dev'),
+        platform: platform,
       );
       final ScriptRunner scriptRunner = ScriptRunner(
         fs: fs,
         dartSdk: dartSdk,
         logger: BufferLogger(),
+        platform: platform,
       );
 
       await scriptRunner.run(<String>[script]);
