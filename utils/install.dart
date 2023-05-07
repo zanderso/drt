@@ -52,9 +52,9 @@ void maybeAppendStringToFile(
 }
 
 void main() async {
-  final FileSystem fs = LocalFileSystem();
-  final Platform platform = LocalPlatform();
-  final ProcessManager pm = LocalProcessManager();
+  const FileSystem fs = LocalFileSystem();
+  const Platform platform = LocalPlatform();
+  const ProcessManager pm = LocalProcessManager();
   final String dart = platform.executable;
   final String packageConfigPath = (await Isolate.packageConfig)!.path;
   final Directory packageRoot = fs.file(packageConfigPath).parent.parent;

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io' show exitCode;
+import 'dart:io' as io show exitCode, stdout;
 
 import 'package:args/args.dart';
 import 'package:file/file.dart';
@@ -25,11 +25,13 @@ abstract class Logger {
 }
 
 class LocalLogger implements Logger {
-  @override
-  void printLog(String message) => print(message);
+  const LocalLogger();
 
   @override
-  void printError(String message) => print('ERROR: $message');
+  void printLog(String message) => io.stdout.writeln(message);
+
+  @override
+  void printError(String message) => io.stdout.writeln('ERROR: $message');
 }
 
 class ScriptRunner {
@@ -206,27 +208,28 @@ Future<void> main(List<String> arguments) async {
   );
   final ArgResults parsedArguments = argParser.parse(arguments);
   if (parsedArguments['help'] as bool? ?? false) {
-    print('This program runs standalone Dart scripts.');
-    print('usage: drt [drt options] path/to/script.dart [script arguments]');
-    print(argParser.usage);
-    exitCode = 1;
+    io.stdout.writeln('This program runs standalone Dart scripts.');
+    io.stdout.writeln(
+        'usage: drt [drt options] path/to/script.dart [script arguments]');
+    io.stdout.writeln(argParser.usage);
+    io.exitCode = 1;
     return;
   }
 
-  final FileSystem fs = LocalFileSystem();
+  const FileSystem fs = LocalFileSystem();
   final DartSDK dartSdk = DartSDK(
     fs: fs,
-    processManager: LocalProcessManager(),
-    platform: LocalPlatform(),
+    processManager: const LocalProcessManager(),
+    platform: const LocalPlatform(),
   );
   final ScriptRunner scriptRunner = ScriptRunner(
     fs: fs,
     dartSdk: dartSdk,
-    logger: LocalLogger(),
-    platform: LocalPlatform(),
+    logger: const LocalLogger(),
+    platform: const LocalPlatform(),
     offline: parsedArguments['offline'] as bool? ?? false,
     analyze: parsedArguments['analyze'] as bool? ?? false,
   );
   await scriptRunner.run(parsedArguments.rest);
-  exitCode = scriptRunner.result;
+  io.exitCode = scriptRunner.result;
 }

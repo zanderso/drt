@@ -31,18 +31,18 @@ void main() {
     });
 
     test('runs normally without snapshot or package config', () async {
-      final String script = '/script.dart';
-      final String scriptContents = '''
+      const String script = '/script.dart';
+      const String scriptContents = '''
         import 'package:process/process.dart';
 
         void main() {}
       ''';
-      final String appJitSnapshotPath = '/.script.jit';
-      final String packageConfigPath = '/.script.package_config.json';
-      final String tempDirPath = '/drt_rand0';
+      const String appJitSnapshotPath = '/.script.jit';
+      const String packageConfigPath = '/.script.package_config.json';
+      const String tempDirPath = '/drt_rand0';
       fakeProcessManager.addCommands(<FakeCommand>[
         FakeCommand(
-          command: <String>['dart', 'pub', 'get'],
+          command: const <String>['dart', 'pub', 'get'],
           workingDirectory: tempDirPath,
           onRun: () {
             final String packageConfigPath = fs.path.join(
@@ -54,7 +54,7 @@ void main() {
           },
         ),
         FakeCommand(
-          command: <String>[
+          command: const <String>[
             'dart',
             '--disable-dart-dev',
             '--snapshot-kind=app-jit',
@@ -95,10 +95,10 @@ void main() {
     });
 
     test('runs normally with a snapshot', () async {
-      final String script = '/script.dart';
-      final String appJitSnapshotPath = '/.script.jit';
+      const String script = '/script.dart';
+      const String appJitSnapshotPath = '/.script.jit';
       fakeProcessManager.addCommands(<FakeCommand>[
-        FakeCommand(
+        const FakeCommand(
           command: <String>[
             'dart',
             appJitSnapshotPath,

@@ -38,10 +38,10 @@ void main() {
     });
 
     test('can generate package config from pubspec', () async {
-      final String tempDirPath = '/drt_rand0';
-      final String packageConfigContents = 'package config contents';
+      const String tempDirPath = '/drt_rand0';
+      const String packageConfigContents = 'package config contents';
       fakeProcessManager.addCommand(FakeCommand(
-        command: <String>['dart', 'pub', 'get'],
+        command: const <String>['dart', 'pub', 'get'],
         workingDirectory: tempDirPath,
         onRun: () {
           final String packageConfigPath = fs.path.join(
@@ -75,7 +75,8 @@ void main() {
     });
 
     test('uses existing package config file when possible', () async {
-      final String packageConfigContents = '''{
+      const String packageConfigContents = '''
+{
   "configVersion": 2,
   "packages": [
     {
@@ -107,7 +108,7 @@ void main() {
         'package_config.json',
       );
       fs.file(packageConfigPath)
-        ..create(recursive: true)
+        ..createSync(recursive: true)
         ..writeAsStringSync(packageConfigContents);
 
       final DartSDK dartSdk = DartSDK(
@@ -131,7 +132,8 @@ void main() {
     test(
         'falls back on pub when an existing package config is missing something',
         () async {
-      final String packageConfigContents = '''{
+      const String packageConfigContents = '''
+{
   "configVersion": 2,
   "packages": [
     {
@@ -163,13 +165,13 @@ void main() {
         'package_config.json',
       );
       final File packageConfigFile = fs.file(packageConfigPath)
-        ..create(recursive: true)
+        ..createSync(recursive: true)
         ..writeAsStringSync(packageConfigContents);
 
-      final String tempDirPath = '/drt_rand0';
-      final String newPackageConfigContents = 'package config contents';
+      const String tempDirPath = '/drt_rand0';
+      const String newPackageConfigContents = 'package config contents';
       fakeProcessManager.addCommand(FakeCommand(
-        command: <String>['dart', 'pub', 'get'],
+        command: const <String>['dart', 'pub', 'get'],
         workingDirectory: tempDirPath,
         onRun: () {
           final String packageConfigPath = fs.path.join(
@@ -238,7 +240,7 @@ void main() {
         platform: platform,
       );
 
-      Map<String, String> packagesMap = generator.makePackagesMap();
+      final Map<String, String> packagesMap = generator.makePackagesMap();
 
       expect(
           packagesMap,

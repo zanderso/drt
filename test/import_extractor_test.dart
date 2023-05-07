@@ -16,7 +16,7 @@ void main() {
     });
 
     test('Extracts package imports from a script', () {
-      final String scriptContents = '''
+      const String scriptContents = '''
         import 'dart:io'
           show exitCode, Process, ProcessResult, ProcessStartMode;
 
@@ -44,7 +44,7 @@ void main() {
         fs: fs,
       );
       final Set<String> packages = extractor.getPackages(scriptPath);
-      final List<String> sortedPackages = List.of(packages)..sort();
+      final List<String> sortedPackages = List<String>.of(packages)..sort();
       expect(
           sortedPackages,
           equals(<String>[

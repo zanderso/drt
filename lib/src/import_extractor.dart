@@ -14,8 +14,8 @@ class ImportVisitor extends RecursiveAstVisitor<void> {
 
   final FileSystem fs;
   final String scriptPath;
-  final Set<String> packageImports = {};
-  final Set<String> fsImports = {};
+  final Set<String> packageImports = <String>{};
+  final Set<String> fsImports = <String>{};
 
   @override
   void visitImportDirective(ImportDirective node) {

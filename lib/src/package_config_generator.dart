@@ -32,7 +32,7 @@ class PackageConfigGenerator {
       ..writeln('environment:')
       ..writeln("  sdk: '>=3.0.0-0 <4.0.0'")
       ..writeln('dependencies:');
-    for (final import in packages) {
+    for (final String import in packages) {
       pubspecBuilder.writeln('  $import: any');
     }
 
@@ -40,7 +40,7 @@ class PackageConfigGenerator {
     if (packages.any(packagesMap.containsKey)) {
       pubspecBuilder.writeln();
       pubspecBuilder.writeln('dependency_overrides:');
-      for (final import in packages) {
+      for (final String import in packages) {
         if (!packagesMap.containsKey(import)) {
           continue;
         }

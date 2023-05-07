@@ -14,9 +14,9 @@ import 'package:process/process.dart';
 import 'src/test_wrapper.dart';
 
 Future<void> main() async {
-  final FileSystem fs = LocalFileSystem();
-  final Platform platform = LocalPlatform();
-  final ProcessManager pm = LocalProcessManager();
+  const FileSystem fs = LocalFileSystem();
+  const Platform platform = LocalPlatform();
+  const ProcessManager pm = LocalProcessManager();
   final String dart = platform.executable;
   final String packageConfigPath = (await Isolate.packageConfig)!.path;
   final Directory packageRoot = fs.file(packageConfigPath).parent.parent;
@@ -119,7 +119,7 @@ Future<void> main() async {
 
   test('Stdin/out are plumbed correctly', () async {
     final File echoScriptFile = scriptsDirectory.childFile('echo_stdin.dart');
-    io.Process process = await pm.start(<String>[
+    final io.Process process = await pm.start(<String>[
       drtExe.path,
       echoScriptFile.path,
     ]);
@@ -132,7 +132,7 @@ Future<void> main() async {
     process.stdout.listen((List<int> data) {
       stdoutBuffer.write(utf8.decode(data));
     }, onDone: () {
-      stdoutLines = LineSplitter().convert(stdoutBuffer.toString());
+      stdoutLines = const LineSplitter().convert(stdoutBuffer.toString());
     });
 
     final StringBuffer stderrBuffer = StringBuffer();
