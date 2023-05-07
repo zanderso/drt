@@ -1,33 +1,34 @@
 # `drt`
 
 `drt` is a program that runs bare Dart scripts without the need for a package,
-`pubspec.yaml`, etc.
+`pubspec.yaml`, and other boilerplate.
 
 ## Installation
 
 Clone from github:
-```
+```bash
 $ git clone https://github.com/zanderso/drt.git
 ```
 
-You can then either use `utils/install` to build it and put it on your `PATH`,
-or build it manually and do what you like with it.
+You can then either run `utils/install.dart` to build it and put it on your
+`PATH`, or build it manually and do what you like with it.
 
 ### Install script
 
-```
+After clonging:
+```bash
 $ cd drt
 $ dart pub get
 $ dart utils/install.dart
 ```
 
-This will compile `drt` and prompt you to allow editing `.rc` files as
-appropriate for your environment.
+This will compile `drt` to a standlone binary and prompt you to allow editing
+`rc` files in your home directory as appropriate for your environment.
 
 ### Manually
 
 Build directly using the Dart SDK:
-```
+```bash
 $ cd drt
 $ dart compile exe -o bin/drt bin/drt.dart
 # Result in bin/drt
@@ -35,12 +36,12 @@ $ dart compile exe -o bin/drt bin/drt.dart
 
 ## Usage
 
-`drt` can run Dart programs that have both `package:` and file system `import`s
-from the command line.
+`drt` can run Dart programs that have both `package:` and file system path
+`import`s from the command line.
 
 ### Basic usage
 
-Suppose you had a Dart file `arg_echo.dart`:
+Suppose you have a Dart file `arg_echo.dart`:
 ```dart
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
@@ -55,7 +56,7 @@ void main(List<String> arguments) {
 ```
 
 Then with `drt` you can run it like so:
-```
+```bash
 $ drt arg_echo.dart a b c
 arg/a
 arg/b
@@ -66,12 +67,12 @@ Without worrying about creating a new package, setting up a `pubspec.yaml`, etc.
 
 ### shebang
 
-If `drt` is on your path, then a file whose first line is:
-```
+On Linux and macOS, if `drt` is on your path, then a file whose first line is:
+```dart
 #!/usr/bin/env drt
 ```
 can be run directly, like:
-```
+```bash
 $ ./arg_echo.dart
 arg/a
 arg/b
@@ -79,16 +80,15 @@ arg/c
 ```
 
 As long as the file `arg_echo.dart` is marked executable.
+```bash
+$ chmod +x arg_echo.dart
+```
 
 ### `--offline`
 
 When the flag `--offline` is passed to `drt`, `pub` will not touch the network
-when resolving the extracted package dependencies.
-
-### `--analyze`
-
-When the flag `--analyze` is passed to `drt`, the script will be analyzed
-with default analyzer options instead of running it.
+when resolving package dependencies. If a dependency is not already in `pub`'s
+cache, the script will fail to run.
 
 ### `DRT_PACKAGE_PATH`
 
@@ -97,19 +97,23 @@ paths, those paths will be searched for packages. When found, the first
 isntance of a package from the search paths will be used as a dependency
 override instead of a version pulled form `pub`.
 
+### `--analyze`
+
+When the flag `--analyze` is passed to `drt`, the script will be analyzed
+with default analyzer options instead of running it.
+
 ## Background
 
 It's convenient to be able to whip up Python scripts quickly, and run them
 immediately.
-```
+```bash
 $ touch script.py
 $ vim script.py  # edit edit edit
 $ python3 script.py
 ```
 
-In Dart there's a bit more setup involved. Dart's tooling reduces the manual
-setup overhead quite a bit.
-```
+In Dart there's a bit more setup involved.
+```bash
 $ dart create my_new_dart_thing
 $ cd my_new_dart_thing
 $ vim pubspec.yaml  # Bring in some dependencies
@@ -118,26 +122,6 @@ $ vim bin/my_new_dart_thing.dart  # edit edit edit
 $ dart run bin/my_new_dart_thing.dart
 ```
 I suspect there's even less typing if you use an IDE to help get set up.
-
-## Overview
-
-This package aims to give a more Python-y, script-y experience for Dart. It does
-this with some straightforward wrappers around the Dart SDK tooling. With this
-package you can do:
-
-
-
-And not worry about setting up a directory structure, editing the `pubspec.yaml`
-etc.. That is you type in some Dart code, and then you're running.
-
-### Why not just use DartPad?
-
-As an alternative to Python scripts that inspect the local file system, DartPad
-isn't a real replacement for that.
-
-### Why not just use an IDE that makes Dart more convenient?
-
-Sorry, I'm a dinosaur. IDEs drive me crazy.
 
 ## How does it work?
 

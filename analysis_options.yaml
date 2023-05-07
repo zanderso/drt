@@ -1,5 +1,9 @@
 include: package:lints/recommended.yaml
 
+analyzer:
+  exclude:
+    - examples/*.dart
+
 linter:
   rules:
     # This list is derived from the list of all available lints located at
