@@ -14,21 +14,24 @@ void main() {
   group('PackageConfigGenerator', () {
     late MemoryFileSystem fs;
     late FakeProcessManager fakeProcessManager;
+    late Platform platform;
 
     setUp(() {
       fs = MemoryFileSystem.test();
       fakeProcessManager = FakeProcessManager.empty();
+      platform = FakePlatform(environment: <String, String>{});
     });
 
     test('can build pubspec.yaml string', () {
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(),
+        platform: platform,
       );
       final PackageConfigGenerator generator = PackageConfigGenerator(
         dartSdk: dartSdk,
         fs: fs,
+        platform: platform,
       );
       final String pubspec = generator.buildPubspecString(<String>{'analyzer'});
       expect(pubspec, contains('dependencies:\n  analyzer: any'));
@@ -55,11 +58,12 @@ void main() {
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(),
+        platform: platform,
       );
       final PackageConfigGenerator generator = PackageConfigGenerator(
         dartSdk: dartSdk,
         fs: fs,
+        platform: platform,
       );
       final String pubspec = generator.buildPubspecString(<String>{'analyzer'});
       final File packageConfigFile = fs.file('package_config_file');
@@ -109,11 +113,12 @@ void main() {
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(),
+        platform: platform,
       );
       final PackageConfigGenerator generator = PackageConfigGenerator(
         dartSdk: dartSdk,
         fs: fs,
+        platform: platform,
       );
       // This will try to call 'pub' and fail if the fast path check fails
       // because 'dart pub get' won't be in the fakePackageManager.
@@ -181,11 +186,12 @@ void main() {
       final DartSDK dartSdk = DartSDK(
         fs: fs,
         processManager: fakeProcessManager,
-        platform: FakePlatform(),
+        platform: platform,
       );
       final PackageConfigGenerator generator = PackageConfigGenerator(
         dartSdk: dartSdk,
         fs: fs,
+        platform: platform,
       );
       // This will try to call 'pub' and fail if the fast path check fails
       // because 'dart pub get' won't be in the fakePackageManager.
@@ -196,6 +202,78 @@ void main() {
       expect(
         packageConfigFile.readAsStringSync(),
         equals(newPackageConfigContents),
+      );
+    });
+  });
+
+  group('PackageConfigGenerator with path overrides', () {
+    late MemoryFileSystem fs;
+    late FakeProcessManager fakeProcessManager;
+    late Platform platform;
+    late String packagesPath;
+
+    setUp(() {
+      fs = MemoryFileSystem.test();
+      packagesPath = fs.path.join('/path', 'to', 'packages');
+      fs.directory(packagesPath).createSync(recursive: true);
+      fs.directory(packagesPath).childDirectory('args').createSync();
+      fs.directory(packagesPath).childDirectory('file').createSync();
+      fs.directory(packagesPath).childDirectory('path').createSync();
+
+      fakeProcessManager = FakeProcessManager.empty();
+      platform = FakePlatform(environment: <String, String>{
+        PackageConfigGenerator.drtPackagesPathVar: packagesPath,
+      });
+    });
+
+    test('finds packages using the packages path', () {
+      final DartSDK dartSdk = DartSDK(
+        fs: fs,
+        processManager: fakeProcessManager,
+        platform: platform,
+      );
+      final PackageConfigGenerator generator = PackageConfigGenerator(
+        dartSdk: dartSdk,
+        fs: fs,
+        platform: platform,
+      );
+
+      Map<String, String> packagesMap = generator.makePackagesMap();
+
+      expect(
+          packagesMap,
+          equals(<String, String>{
+            'args': fs.path.join(packagesPath, 'args'),
+            'file': fs.path.join(packagesPath, 'file'),
+            'path': fs.path.join(packagesPath, 'path'),
+          }));
+    });
+
+    test('', () {
+      final DartSDK dartSdk = DartSDK(
+        fs: fs,
+        processManager: fakeProcessManager,
+        platform: platform,
+      );
+      final PackageConfigGenerator generator = PackageConfigGenerator(
+        dartSdk: dartSdk,
+        fs: fs,
+        platform: platform,
+      );
+
+      final String pubspec = generator.buildPubspecString(<String>{
+        'args',
+        'file',
+      });
+
+      expect(pubspec, contains('dependency_overrides:'));
+      expect(
+        pubspec,
+        contains('  args:\n    path: ${fs.path.join(packagesPath, "args")}'),
+      );
+      expect(
+        pubspec,
+        contains('  file:\n    path: ${fs.path.join(packagesPath, "file")}'),
       );
     });
   });
