@@ -104,7 +104,7 @@ void main() {
     });
 
     test('runDart does something reasonable', () async {
-      fakeProcessManager.addCommand(FakeCommand(
+      fakeProcessManager.addCommand(const FakeCommand(
         command: <String>['dart', 'run', 'some_script.dart'],
       ));
       final DartSDK dartSdk = DartSDK(
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('runPub does something reasonable', () async {
-      fakeProcessManager.addCommand(FakeCommand(
+      fakeProcessManager.addCommand(const FakeCommand(
         command: <String>['dart', 'pub', 'get'],
       ));
       final DartSDK dartSdk = DartSDK(
@@ -133,8 +133,8 @@ void main() {
     });
 
     test('runPub plumbs the working directory', () async {
-      final String workingDirectory = 'working_directory';
-      fakeProcessManager.addCommand(FakeCommand(
+      const String workingDirectory = 'working_directory';
+      fakeProcessManager.addCommand(const FakeCommand(
         command: <String>['dart', 'pub', 'get'],
         workingDirectory: workingDirectory,
       ));

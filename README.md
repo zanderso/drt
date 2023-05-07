@@ -1,27 +1,30 @@
 # `drt`
 
-A program that runs bare Dart scripts.
+`drt` is a program that runs bare Dart scripts without the need for a package,
+`pubspec.yaml`, etc.
 
-# Installation
+## Installation
 
 Clone from github:
 ```
 $ git clone https://github.com/zanderso/drt.git
 ```
 
-You can then use a helper script to build it and put it on your `PATH`, or
-build it manually and do what you like with it.
+You can then either use `utils/install` to build it and put it on your `PATH`,
+or build it manually and do what you like with it.
 
-## Install script
+### Install script
 
 ```
-$ dart bin/drt.dart utils/install.dart
+$ cd drt
+$ dart pub get
+$ dart utils/install.dart
 ```
 
-Which will compile `drt` and prompt you to allow editing `.rc` files as
+This will compile `drt` and prompt you to allow editing `.rc` files as
 appropriate for your environment.
 
-## Manually
+### Manually
 
 Build directly using the Dart SDK:
 ```
@@ -30,7 +33,71 @@ $ dart compile exe -o bin/drt bin/drt.dart
 # Result in bin/drt
 ```
 
-# Background
+## Usage
+
+`drt` can run Dart programs that have both `package:` and file system `import`s
+from the command line.
+
+### Basic usage
+
+Suppose you had a Dart file `arg_echo.dart`:
+```dart
+import 'package:args/args.dart';
+import 'package:path/path.dart' as path;
+
+void main(List<String> arguments) {
+  final ArgParser argParser = ArgParser();
+  final ArgResults parsedArguments = argParser.parse(arguments);
+  for (final String arg in parsedArguments.rest) {
+    print(path.join('arg', arg));
+  }
+}
+```
+
+Then with `drt` you can run it like so:
+```
+$ drt arg_echo.dart a b c
+arg/a
+arg/b
+arg/c
+```
+
+Without worrying about creating a new package, setting up a `pubspec.yaml`, etc.
+
+### shebang
+
+If `drt` is on your path, then a file whose first line is:
+```
+#!/usr/bin/env drt
+```
+can be run directly, like:
+```
+$ ./arg_echo.dart
+arg/a
+arg/b
+arg/c
+```
+
+As long as the file `arg_echo.dart` is marked executable.
+
+### `--offline`
+
+When the flag `--offline` is passed to `drt`, `pub` will not touch the network
+when resolving the extracted package dependencies.
+
+### `--analyze`
+
+When the flag `--analyze` is passed to `drt`, the script will be analyzed
+with default analyzer options instead of running it.
+
+### `DRT_PACKAGE_PATH`
+
+If the environment variable `DRT_PACKAGE_PATH` is set to a list of `:`-separated
+paths, those paths will be searched for packages. When found, the first
+isntance of a package from the search paths will be used as a dependency
+override instead of a version pulled form `pub`.
+
+## Background
 
 It's convenient to be able to whip up Python scripts quickly, and run them
 immediately.
@@ -52,46 +119,27 @@ $ dart run bin/my_new_dart_thing.dart
 ```
 I suspect there's even less typing if you use an IDE to help get set up.
 
-# Overview
+## Overview
 
 This package aims to give a more Python-y, script-y experience for Dart. It does
 this with some straightforward wrappers around the Dart SDK tooling. With this
 package you can do:
-```
-arg_echo.dart
-```
-```dart
-import 'package:args/args.dart';
-import 'package:path/path.dart' as path;
 
-void main(List<String> arguments) {
-  final ArgParser argParser = ArgParser();
-  final ArgResults parsedArguments = argParser.parse(arguments);
-  for (final String arg in parsedArguments.rest) {
-    print(path.join('arg', arg));
-  }
-}
-```
-```
-$ drt arg_echo.dart a b c
-arg/a
-arg/b
-arg/c
-```
+
 
 And not worry about setting up a directory structure, editing the `pubspec.yaml`
 etc.. That is you type in some Dart code, and then you're running.
 
-## Why not just use DartPad?
+### Why not just use DartPad?
 
 As an alternative to Python scripts that inspect the local file system, DartPad
 isn't a real replacement for that.
 
-## Why not just use an IDE that makes Dart more convenient?
+### Why not just use an IDE that makes Dart more convenient?
 
 Sorry, I'm a dinosaur. IDEs drive me crazy.
 
-# How does it work?
+## How does it work?
 
 First `drt` uses `package:analyzer` to extract `package:` `import` directives
 from the input script. In doing so, it traverses `import` directives that
