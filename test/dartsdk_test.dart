@@ -59,7 +59,7 @@ void main() {
       fs.file(exePath).createSync(recursive: true);
       fs.file(dartPath).createSync(recursive: true);
 
-      fakeProcessManager.excludedExecutables = <String>{'dart'};
+      fakeProcessManager.excludedExecutables = <String>{'dart', 'dart.exe'};
 
       final DartSDK dartSdk = DartSDK(
         fs: fs,

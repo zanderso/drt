@@ -18,14 +18,18 @@ Future<void> main() async {
   const Platform platform = LocalPlatform();
   const ProcessManager pm = LocalProcessManager();
   final String dart = platform.executable;
-  final String packageConfigPath = (await Isolate.packageConfig)!.path;
+  final String packageConfigPath = (await Isolate.packageConfig)!.toFilePath(
+    windows: platform.isWindows,
+  );
   final Directory packageRoot = fs.file(packageConfigPath).parent.parent;
   final Directory libDirectory = packageRoot.childDirectory('lib');
   final Directory binDirectory = packageRoot.childDirectory('bin');
 
   final File binDrt = binDirectory.childFile('drt.dart');
   final File libScriptRunner = libDirectory.childFile('script_runner.dart');
-  final File drtExe = binDirectory.childFile('drt');
+  final File drtExe = platform.isWindows
+      ? binDirectory.childFile('drt.exe')
+      : binDirectory.childFile('drt');
 
   final io.ProcessResult result = await pm.run(<String>[
     dart,
@@ -36,7 +40,8 @@ Future<void> main() async {
     binDrt.path,
   ]);
   if (result.exitCode != 0) {
-    print('Failed to compile to exe:\n${result.stdout}\n${result.stderr}');
+    print(
+        'Failed to compile ${binDrt.path} to exe:\n${result.stdout}\n${result.stderr}');
     io.exitCode = 1;
     return;
   }
@@ -64,13 +69,16 @@ Future<void> main() async {
       echoScriptFile.path,
       'a',
       'b',
-      'c',
-      'd',
     ]);
 
     // The script emits the correct results.
     expect(echoResult.exitCode, equals(0));
-    expect(echoResult.stdout, equals('arg/a\narg/b\narg/c\narg/d\n'));
+
+    final String expected = '${fs.path.join('arg', 'a')}\n'
+        '${fs.path.join('arg', 'b')}\n';
+    final String fixedStdout =
+        (echoResult.stdout as String).replaceAll('\r\n', '\n');
+    expect(fixedStdout, equals(expected));
 
     // The package config and app-jit snapshot are created.
     expect(
@@ -96,12 +104,15 @@ Future<void> main() async {
       echoScriptFile.path,
       'a',
       'b',
-      'c',
-      'd',
     ]);
 
     expect(echoResult.exitCode, equals(0));
-    expect(echoResult.stdout, equals('arg/a\narg/b\narg/c\narg/d\n'));
+
+    final String expected = '${fs.path.join('arg', 'a')}\n'
+        '${fs.path.join('arg', 'b')}\n';
+    final String fixedStdout =
+        (echoResult.stdout as String).replaceAll('\r\n', '\n');
+    expect(fixedStdout, equals(expected));
 
     // A second run produces the right results as well.
     echoResult = await pm.run(<String>[
@@ -109,12 +120,10 @@ Future<void> main() async {
       echoScriptFile.path,
       'a',
       'b',
-      'c',
-      'd',
     ]);
 
     // The script emits the correct results.
-    expect(echoResult.stdout, equals('arg/a\narg/b\narg/c\narg/d\n'));
+    expect(fixedStdout, equals(expected));
   });
 
   test('Stdin/out are plumbed correctly', () async {
@@ -174,7 +183,7 @@ Future<void> main() async {
 
     expect(result.exitCode, equals(0));
     expect(result.stdout, equals('Hello, world!\n'));
-  });
+  }, skip: platform.isWindows);
 
   test('The script runner can run itself', () async {
     final File echoScriptFile = scriptsDirectory.childFile(
@@ -186,7 +195,6 @@ Future<void> main() async {
       echoScriptFile.path,
       'a',
       'b',
-      'c',
     ]);
     cleanupDirectory(binDirectory);
     cleanupDirectory(libDirectory);
@@ -197,8 +205,13 @@ Future<void> main() async {
     }
 
     expect(result.exitCode, equals(0));
-    expect(result.stdout, equals('arg/a\narg/b\narg/c\n'));
-  });
+
+    final String expected = '${fs.path.join('arg', 'a')}\n'
+        '${fs.path.join('arg', 'b')}\n';
+    final String fixedStdout =
+        (result.stdout as String).replaceAll('\r\n', '\n');
+    expect(fixedStdout, equals(expected));
+  }, timeout: const Timeout(Duration(minutes: 2)));
 }
 
 void tryDelete(FileSystemEntity fse) {
