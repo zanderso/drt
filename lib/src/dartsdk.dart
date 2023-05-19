@@ -5,7 +5,6 @@
 import 'dart:io' show Process, ProcessResult, ProcessStartMode;
 
 import 'package:file/file.dart';
-import 'package:path/path.dart' as path;
 import 'package:platform/platform.dart';
 import 'package:process/process.dart';
 
@@ -63,9 +62,9 @@ class DartSDK {
     // if this program is compiled into a self-contained binary from
     // `dart compile exe`.
     final String exe = platform.executable;
-    final String dartGuess = path.join(
-      path.dirname(exe),
-      'dart${path.extension(exe)}',
+    final String dartGuess = fs.path.join(
+      fs.path.dirname(exe),
+      'dart${fs.path.extension(exe)}',
     );
     return fs.file(dartGuess).existsSync() ? dartGuess : null;
   }();
